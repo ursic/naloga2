@@ -1,13 +1,8 @@
 body
 {
-    margin-left: 60px;
+    margin: 0 5% 0 5%;
     background-color: #ebebeb;
     font-family: Helvetica, "Sans-serif";
-}
-
-.clear
-{
-    clear: both;
 }
 
 a
@@ -401,4 +396,83 @@ div.tooltip
     text-align: center
     text-decoration: none;
     position: absolute;
+}
+
+
+.employeeTable{   
+    border-collapse: collapse;
+    border: 1px solid #000000;
+}
+
+.employeeTableHeader {
+    text-align: left;
+    background: none repeat scroll 0 0 #B5B5B5;
+    border-bottom: 1px solid #000000;  
+    padding: 2px 0 2px 0;
+}
+
+.selectHeader {
+    text-align: center;
+    width: 33px;
+}
+
+.selectHeader input {
+    padding: 0px;
+    margin: 0px;
+}
+
+.yearHeader {
+    padding-left: 2px;
+}
+
+.headerMiddle {
+    padding-left: 10px;
+}
+
+.employeeTableOddRow {
+    text-align: left;
+    background: none repeat scroll 0 0 #FFFFFFF;	
+}
+
+.employeeTableEvenRow {
+    text-align: left;
+    background: none repeat scroll 0 0 #D3D3D3;
+}
+
+.checkBox {
+    width: 33px;
+    text-align: center;
+}
+
+.dbHeader {
+    text-align: center;
+}
+
+.dbState {
+    text-align: center;
+}
+
+.storeButton {
+    margin: 20px 20px 0 0;
+    float: left;
+}
+
+.emptyButton  {
+    margin: 20px 20px 0 0;
+    float: left;
+}
+
+.colPrice {
+    padding-right: 11px;
+    text-align: right;
+    width: 80px;
+}
+
+.colMiddle {
+    padding-left: 10px;
+}
+
+.uploadForm {
+    margin-top: 20px;
+    float: left;
 }

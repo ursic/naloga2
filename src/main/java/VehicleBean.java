@@ -1,9 +1,12 @@
+import java.security.MessageDigest;
+
 public class VehicleBean {
     private Integer year;
     private String make;
     private String model;
     private String comment;
     private Double price;
+    private String hash;
 
     public VehicleBean() {
     }
@@ -112,5 +115,24 @@ public class VehicleBean {
     public String toString() {
         return String.format("VehicleBean [year=%s, make=%s, model=%s, comment=%s, price=%s]",
                              year, make, model, comment, price);
+    }
+
+    public void setHash() {
+        StringBuffer sb = new StringBuffer();
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(this.toString().getBytes());
+            byte byteData[] = md.digest();
+ 
+            //convert the byte to hex format method 1
+            for (int i = 0; i < byteData.length; i++) {
+                sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            this.hash = sb.toString();
+        } catch (Exception ex) {}
+    }
+
+    public String getHash() {
+        return hash;
     }
 }

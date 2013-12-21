@@ -1,100 +1,157 @@
 import java.sql.*;
 import javax.faces.bean.*;
+import java.io.*;
+import java.util.*;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.myfaces.custom.fileupload.UploadedFile;
+
 import org.slf4j.*;
-import java.io.File;
-import java.io.FileReader;
-import org.supercsv.io.*;
-import org.supercsv.prefs.*;
-import org.supercsv.cellprocessor.*;
-import org.supercsv.cellprocessor.constraint.*;
-import org.supercsv.cellprocessor.ift.*;
 
 @ManagedBean
 public class Naloga2 {
+    DB db = new DB();
     Logger logger = LoggerFactory.getLogger(getClass());
     private boolean isDataValid = false;
     private final String filePath = System.getProperty("java.io.tmpdir") + File.separator + "data.txt";
+    ArrayList<VehicleBean> vehicles = new ArrayList<VehicleBean>();
+    private Integer numVehicles = 0;
+    private Map<String, Boolean> vehiclesInDb = new HashMap<String, Boolean>();
+    private Map<String, Boolean> checkedVehicles = new HashMap<String, Boolean>();
+    private UploadedFile uploadedFile = null;
 
     public Naloga2() {
-        logger.info("path " + filePath);
-        loadData();
+        loadVehiclesFromDB();
+        loadVehiclesFromFile();
 
-        try {
-            readWithCsvBeanReader();
-        } catch (Exception e) {
-            logger.info("Could not read CSV file: " + e.getMessage());
+        numVehicles = vehicles.size();
+        isDataValid = (0 < numVehicles);
+    }
+
+    private void loadVehiclesFromDB() {
+        QueryResult qr = db.getVehicles();
+
+        if (qr.error) {
+            logger.error("Could not load data: " + qr.errorMsg());
+            return;
+        }
+
+        vehicles.addAll(qr.result);
+
+        if ((null != qr.result) && (0 < qr.result.size())) {
+            for (VehicleBean vehicle : qr.result) {
+                vehiclesInDb.put(vehicle.getHash(), true);
+                checkedVehicles.put(vehicle.getHash(), true);
+            }
         }
     }
 
-    private void loadData() {
+    /*
+     * Load vehicle data from file.
+     * Load only those that aren't already
+     * loaded from the database.
+     */
+    private void loadVehiclesFromFile() {
+        ArrayList<VehicleBean> newVehicles;
         File f = new File(filePath);
         if (!f.exists() || !f.canRead()) return;
-        
-        isDataValid = true;
+
+        try {
+            CsvReader csv = new CsvReader();
+            newVehicles = csv.read(filePath);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return;
+        }
+
+        for (VehicleBean vehicle : newVehicles) {
+            if (!vehiclesInDb.containsKey(vehicle.getHash())) {
+                vehicles.add(vehicle);
+                vehiclesInDb.put(vehicle.getHash(), false);
+                checkedVehicles.put(vehicle.getHash(), false);
+            }
+        }
     }
-    
+
+    public void storeVehicles() {
+        ArrayList<VehicleBean> newVehicles = new ArrayList<VehicleBean>();
+
+        QueryResult qr = db.createTable();
+        if (qr.error) {
+            logger.error("Could not create table: " + qr.errorMsg());
+        }
+
+        for (VehicleBean vehicle : vehicles) {
+            if (checkedVehicles.get(vehicle.getHash()) &&
+                !vehiclesInDb.get(vehicle.getHash())) {
+                newVehicles.add(vehicle);
+            }
+        }
+
+        if (newVehicles.size() <= 0) return;
+
+        qr = db.storeVehicles(newVehicles);
+
+        // Update vehicles' statuses.
+        if (!qr.error) {
+            for (VehicleBean vehicle : newVehicles) {
+                vehiclesInDb.put(vehicle.getHash(), true);
+                checkedVehicles.put(vehicle.getHash(), true);
+            }
+        } else {
+            logger.error("Could not store vehicles: " + qr.errorMsg());
+        }
+    }
+
+    /*
+     * Remove vehicles from the database.
+     */
+    public void removeVehicles() {
+        QueryResult qr = db.removeVehicles();
+        vehiclesInDb.clear();
+        checkedVehicles.clear();
+        if (qr.error) {
+            logger.error("Could not remove vehicles from database: " + qr.errorMsg());
+        }
+    }
+
+    public void setUploadedFile(UploadedFile uploadedFile) {
+        this.uploadedFile = uploadedFile;
+    }
+
+    public UploadedFile getUploadedFile() {
+        return uploadedFile;
+    }
+
+    public void upload() {
+        Uploader uploader = new Uploader();
+
+        if (null == uploadedFile) {
+            logger.error("Could not receive uploaded file.");
+            return;
+        }
+
+        System.out.println("submit file ");
+        uploader.storeUploadedFile(uploadedFile);
+    }
+
+    public Map<String, Boolean> getVehiclesInDb() {
+        return vehiclesInDb;
+    }
+
+    public Map<String, Boolean> getCheckedVehicles() {
+        return checkedVehicles;
+    }
+
     public boolean getIsDataValid() {
         return isDataValid;
     }
 
-    public void insert() {
-        DB db = new DB();
-        QueryResult qr;
-        db.createTable();
-        qr = db.insert("INSERT INTO vehicles (YEAR) VALUES (1988)");
-        if (qr.error) {
-            logger.error("Could not insert: " + qr.result);
-        }
-    }
-  
-    public String someActionControllerMethod() {
-
-        logger.info("path " + System.getProperty("java.io.tmpdir"));
-
-        insert();
-
-        return("page-b");  // Means to go to page-b.xhtml (since condition is not mapped in faces-config.xml)
-    }
-  
-    public String someOtherActionControllerMethod() {
-        return("index");  // Means to go to page-a.xhtml (since condition is not mapped in faces-config.xml)
+    public Integer getNumVehicles() {
+        return numVehicles;
     }
 
-    private static CellProcessor[] getProcessors() {
-        final CellProcessor[] processors = new CellProcessor[] { 
-            new ParseInt(),     // Year
-            new NotNull(),      // Make
-            new NotNull(),      // Model
-            new Optional(new NotNull()), // Comment
-            new ParseDouble()    // Price
-        };
-        return processors;
-    }
-
-    private void readWithCsvBeanReader() throws Exception {
-        ICsvBeanReader beanReader = null;
-//        try {
-            beanReader = new CsvBeanReader(new FileReader(filePath), CsvPreference.STANDARD_PREFERENCE);
-                
-            // the header elements are used to map the values to the bean (names must match)
-            final String[] header = beanReader.getHeader(true);
-//            final CellProcessor[] processors = getProcessors();
-                
-            VehicleBean vehicle;
-//            while( (customer = beanReader.read(CustomerBean.class, header, processors)) != null ) {
-            while ((vehicle = beanReader.read(VehicleBean.class, header)) != null) {
-                System.out.println(String.format("year=%s, make=%s, model=%s, comment=%s, price=%s",
-                                                 beanReader.getLineNumber(),
-                                                 beanReader.getRowNumber(),
-                                                 vehicle));
-            }
-        // } catch (Exception e) {
-        //     logger.info("Could not read the CSV file: " + e.getMessage());
-        // }
-//        finally {
-            if (beanReader != null) {
-                beanReader.close();
-            }
-//      }
+    public ArrayList<VehicleBean> getVehicles() {
+        return vehicles;
     }
 }

@@ -2,66 +2,75 @@
           "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:h="http://java.sun.com/jsf/html">
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:t="http://myfaces.apache.org/tomahawk">
   <h:head>
     <f:view locale="si">
       <title>#{lang['task2']}</title>
     </f:view>
     <link href="./css/naloga2.css" rel="stylesheet" type="text/css" />
   </h:head>
+  <script type="text/javascript" src="./js/jquery-2.0.3.min.js"></script>
   <h:body>
     <f:view locale="si">
-      <h2>#{lang['list']}</h2>
+      <h2><a href="/">#{lang['list']}</a></h2>
       <h:panelGroup rendered="#{!naloga2.isDataValid}">
-        <h4>#{lang['no_file']}</h4>
-        <button>#{lang['upload']}</button>
+        <h4>#{lang['file_error']}</h4>
       </h:panelGroup>
 
-        <p>
-          <b>This is Page A.</b> You should access this page as "page-a.jsf",
-          not as "page-a.xhtml". If the following looks like an input form, and pressing
-          the button navigates to Page B, it shows that you have
-          correctly installed JSF 2. Use this project as the starting point
-          for your own JSF 2 projects, as described in the tutorial. See the "samples"
-          folder for some template files.
-        </p>
+      <h:form rendered="#{naloga2.isDataValid}">
+        #{lang['num_vehicles']}: #{naloga2.numVehicles}
 
-      <div align="center">
-        <fieldset>
-          <legend>JSF Test Form</legend>
-          <h:form>
-            Some random data: <h:inputText value="" /><br/>  <!-- Corresponds to getSomeProperty and setSomeProperty -->
-            <!-- Calls "someActionControllerMethod" and uses return value as base name of page to navigate to. -->
-            <h:commandButton value="Go to Page B" 
-                             action="#{naloga2.someActionControllerMethod}"/>     
-          </h:form>
-        </fieldset>
-      </div>
-      <p>
-        If the tags like h:form and h:commandButton are totally ignored, it probably
-        means that you don't have the JSF JAR file in WEB-INF/lib, or that
-        you haven't mapped the FacesServlet in web.xml. If you get a JSF-specific error message,
-        it probably means that you used the wrong URL (i.e, ending in page-a.<b>xhtml</b> instead of 
-        page-a.<b>jsf</b>).
-      </p>
-      <p>
-        Note: when making your own facelets pages (i.e., JSF .xhtml pages) in a project based on
-        this jsf-blank project, copy the template files from the "samples" folder to
-        the top-level WebContent folder, then rename the files. This is better than
-        than using this page directly, since this page has many extraneous entries.
-      </p>
+        <h:dataTable value="#{naloga2.vehicles}" var="vehicle"
+                     styleClass="employeeTable"
+                     headerClass="employeeTableHeader"
+                     rowClasses="employeeTableOddRow,employeeTableEvenRow"
+                     columnClasses="checkBox,dbState,colMiddle,colMiddle,colMiddle,colMiddle,colPrice">
+          <h:column headerClass="employeeTableHeader selectHeader">
+            <f:facet name="header"><h:selectBooleanCheckbox name="selectAll" id="selectAll" /></f:facet>
+            <h:selectBooleanCheckbox
+               name="select"
+               rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}"
+               value="#{naloga2.checkedVehicles[vehicle.hash]}" />
+          </h:column>
+          <h:column headerClass="employeeTableHeader dbHeader">
+            <f:facet name="header">#{lang['in_database']}</f:facet>
+            <h:outputText value="#{lang['yes']}" rendered="#{naloga2.vehiclesInDb[vehicle.hash]}" />
+            <h:outputText value="#{lang['no']}" rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}" />
+          </h:column>
+          <h:column headerClass="employeeTableHeader yearHeader headerMiddle">
+            <f:facet name="header">#{lang['year']}</f:facet>
+            #{vehicle.year}
+          </h:column>
+          <h:column headerClass="employeeTableHeader headerMiddle">
+            <f:facet name="header">#{lang['make']}</f:facet>
+            #{vehicle.make}
+          </h:column>
+          <h:column headerClass="employeeTableHeader headerMiddle">
+            <f:facet name="header">#{lang['model']}</f:facet>
+            #{vehicle.model}
+          </h:column>
+          <h:column headerClass="employeeTableHeader headerMiddle">
+            <f:facet name="header">#{lang['comment']}</f:facet>
+            #{vehicle.comment}
+          </h:column>
+          <h:column headerClass="employeeTableHeader headerMiddle">
+            <f:facet name="header">#{lang['price']}</f:facet>
+            <h:outputText value="#{vehicle.price}">
+              <f:convertNumber pattern="0.00" />
+            </h:outputText>
+          </h:column>
+        </h:dataTable>
+        <h:commandButton value="#{lang['store']}" action="#{naloga2.storeVehicles}" styleClass="storeButton" />
+        <h:commandButton value="#{lang['empty_database']}" action="#{naloga2.removeVehicles}" styleClass="emptyButton" />
+      </h:form>
 
-      <br/><br/><br/><br/><br/><br/><br/><br/><hr/>
-      <font size="-3">All code from the
-        <a href="http://courses.coreservlets.com/Course-Materials/">
-          coreservlets.com J2EE tutorials (servlets, JSP, JSF 2, PrimeFaces, Ajax with jQuery, GWT, Spring, Hibernate, JPA, Hadoop, 
-          SOAP-based and RESTful Web Services, Android development, &amp; Java 7 and Java 8 programming)</a>. There are also live instructor-led
-        <a href="http://courses.coreservlets.com/">training courses on
-          the same J2EE topics (servlets, JSP, JSF 2, PrimeFaces, Ajax with jQuery, GWT, Spring, Hibernate, JPA, Hadoop, 
-          SOAP-based and RESTful Web Services, Android development, &amp; Java 7 and Java 8 programming)</a> These courses
-        can be customized and taught onsite at <i>your</i> organization.
-        Also see the <a href="http://www.coreservlets.com/JSF-Tutorial/jsf2/">JSF 2 tutorial</a> and the
-        <a href="http://www.coreservlets.com/JSF-Tutorial/primefaces/">PrimeFaces tutorial</a>.</font>
+      <h:form enctype="multipart/form-data" styleClass="uploadForm">
+        <t:inputFileUpload value="#{naloga2.uploadedFile}" />
+        <h:commandButton value="#{lang['upload']}" action="#{naloga2.upload}"/>
+      </h:form>
+
     </f:view>
+    <script type="text/javascript" src="./js/naloga2.js"></script>
   </h:body>
 </html>
