@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -13,38 +14,20 @@ import org.slf4j.*;
 public class Uploader {
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    public boolean storeUploadedFile(UploadedFile uploadedFile) {
-        byte[] bytes = null;
+    public boolean storeUploadedFile(UploadedFile uploadedFile, String outFilePath) {
         try {
-            String fileName = FilenameUtils.getName(uploadedFile.getName());
-
-System.out.println("filename " + fileName);
-
             String contentType = uploadedFile.getContentType();
-
-            if ("text/plain" != contentType) {
+            if (!contentType.equals("text/plain")) {
                 logger.error("Uploaded file is of wrong MIME type.");
                 return false;
             }
-
-            bytes = uploadedFile.getBytes();
-            System.out.println("content " + new String(bytes));
+            PrintWriter out = new PrintWriter(outFilePath);
+            out.println(new String(uploadedFile.getBytes()));
+            out.close();
             return true;
         } catch (Exception ex) {
             logger.error("Could not retrieve uploaded file: " + ex.getMessage());
             return false;
         }
-            // FacesContext.getCurrentInstance().addMessage(null, 
-            //                                              new FacesMessage(String.format("File '%s' of type '%s' successfully uploaded!", fileName, contentType)));
     }
-
-    // public UploadedFile getUploadedFile() {
-    //     return uploadedFile;
-    // }
-
-    // public void setUploadedFile(UploadedFile uploadedFile) {
-    //     System.out.println("setting uploaded file " + uploadedFile);
-    //     this.uploadedFile = uploadedFile;
-    // }
-
 }

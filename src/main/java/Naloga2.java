@@ -20,15 +20,7 @@ public class Naloga2 {
     private Map<String, Boolean> checkedVehicles = new HashMap<String, Boolean>();
     private UploadedFile uploadedFile = null;
 
-    public Naloga2() {
-        loadVehiclesFromDB();
-        loadVehiclesFromFile();
-
-        numVehicles = vehicles.size();
-        isDataValid = (0 < numVehicles);
-    }
-
-    private void loadVehiclesFromDB() {
+    private void loadVehiclesFromDb() {
         QueryResult qr = db.getVehicles();
 
         if (qr.error) {
@@ -73,6 +65,30 @@ public class Naloga2 {
         }
     }
 
+    /*
+     * Remove vehicles which are not in the database.
+     */
+    private void removeVehiclesFromFile() {
+        ArrayList<VehicleBean> newVehicles = new ArrayList<VehicleBean>();
+        for (VehicleBean vehicle : vehicles) {
+            if (vehiclesInDb.get(vehicle.getHash())) {
+                newVehicles.add(vehicle);                
+            }
+        }
+        vehicles = newVehicles;
+    }
+
+    private void countVehicles() {
+        numVehicles = vehicles.size();
+        isDataValid = (0 < numVehicles);
+    }
+
+    public Naloga2() {
+        loadVehiclesFromDb();
+        loadVehiclesFromFile();
+        countVehicles();
+    }
+
     public void storeVehicles() {
         ArrayList<VehicleBean> newVehicles = new ArrayList<VehicleBean>();
 
@@ -108,11 +124,14 @@ public class Naloga2 {
      */
     public void removeVehicles() {
         QueryResult qr = db.removeVehicles();
-        vehiclesInDb.clear();
-        checkedVehicles.clear();
         if (qr.error) {
             logger.error("Could not remove vehicles from database: " + qr.errorMsg());
         }
+        vehicles.clear();
+        vehiclesInDb.clear();
+        checkedVehicles.clear();
+        loadVehiclesFromFile();
+        countVehicles();
     }
 
     public void setUploadedFile(UploadedFile uploadedFile) {
@@ -131,8 +150,13 @@ public class Naloga2 {
             return;
         }
 
-        System.out.println("submit file ");
-        uploader.storeUploadedFile(uploadedFile);
+        if (!uploader.storeUploadedFile(uploadedFile, filePath)) {
+            logger.error("Could not store uploaded file.");
+            return;
+        }
+        removeVehiclesFromFile();
+        loadVehiclesFromFile();
+        countVehicles();
     }
 
     public Map<String, Boolean> getVehiclesInDb() {
