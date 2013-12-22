@@ -14,7 +14,7 @@ function set_upload_form_listener() {
 }
 
 function set_button_listeners() {
-    $('.uploadButton, .storeButton, .emptyButton').click(function() {
+    $('.uploadButton, .storeButton, .emptyButton, .langButton').click(function() {
         $('.errorText').hide();
         $('.loader').show();
     });

@@ -2,6 +2,8 @@ import org.slf4j.*;
 
 import java.util.*;
 import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 
 import org.supercsv.io.*;
 import org.supercsv.prefs.*;
@@ -63,7 +65,8 @@ public class CsvReader {
         boolean continueReading = true;
         ArrayList<VehicleBean> vehicles = new ArrayList<VehicleBean>();
 
-        beanReader = new CsvBeanReader(new FileReader(filePath), CsvPreference.STANDARD_PREFERENCE);
+        beanReader = new CsvBeanReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"),
+                                       CsvPreference.STANDARD_PREFERENCE);
         header = beanReader.getHeader(true);
 
         if (null == header) {

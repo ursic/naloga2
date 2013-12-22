@@ -2,6 +2,8 @@ import java.sql.*;
 import javax.faces.bean.*;
 import java.io.*;
 import java.util.*;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.Cookie;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.myfaces.custom.fileupload.UploadedFile;
@@ -24,19 +26,24 @@ public class Naloga2 {
     private DB db = new DB();
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    // CSV file path.
     private final String filePath = System.getProperty("java.io.tmpdir") + File.separator + "data.txt";
 
+    // Holder of all vehicles. From CSV and database.
     ArrayList<VehicleBean> vehicles = new ArrayList<VehicleBean>();
-    private Integer numVehicles = 0;
-    private boolean isDataValid = false;
-    private boolean anyInDb = false;
-    private boolean anyInFile = false;
+    private Integer numVehicles = 0;  // Total number of vehicles.
+    // List of all vehicles. Those stored in the database have the value of "true".
     private Map<String, Boolean> vehiclesInDb = new HashMap<String, Boolean>();
+    // Populated when user selects records for storage.
     private Map<String, Boolean> checkedVehicles = new HashMap<String, Boolean>();
 
     private UploadedFile uploadedFile = null;
     private String errorMsg;
     private final String RESOURCE_BUNDLE = "Lang";
+    private final String SI = "si";
+    private final String EN = "en";
+    private final String LOCALE_COOKIE = "lang";
+    private String locale = SI;
 
     private void loadVehiclesFromDb() {
         QueryResult qr = db.getVehicles();
@@ -49,6 +56,7 @@ public class Naloga2 {
 
         vehicles.addAll(qr.result);
 
+        // Mark which vehicles came from database.
         if ((null != qr.result) && (0 < qr.result.size())) {
             for (VehicleBean vehicle : qr.result) {
                 vehiclesInDb.put(vehicle.getHash(), true);
@@ -105,16 +113,13 @@ public class Naloga2 {
     }
 
     private String getMsg(String which) {
-        ResourceBundle rb = ResourceBundle.getBundle(RESOURCE_BUNDLE);
+        ResourceBundle rb = ResourceBundle.getBundle(RESOURCE_BUNDLE, new Locale(locale));
         return rb.getString(which);
     }
 
     private void countVehicles() {
         numVehicles = vehicles.size();
-        isDataValid = (0 < numVehicles);
         errorMsg = (numVehicles <= 0) ? getMsg(Errors.FILE_ERROR) : errorMsg;
-        anyInDb = vehiclesInDb.values().contains(true);
-        anyInFile = vehiclesInDb.values().contains(false);
     }
 
     private void start() {
@@ -123,6 +128,14 @@ public class Naloga2 {
         loadVehiclesFromFile();
         sortVehicles();
         countVehicles();
+    }
+
+    private void refresh() {
+       try {
+           FacesContext.getCurrentInstance().getExternalContext().redirect("/");
+       } catch (Exception e) {
+           logger.error("Could not redirect.");
+       }
     }
 
     /*
@@ -141,7 +154,21 @@ public class Naloga2 {
         });
     }
 
+    private void setLocale(String arg_locale) {
+        String in_locale;
+        Map<String, Object> cookies = FacesContext.getCurrentInstance()
+            .getExternalContext().getRequestCookieMap();
+        if (!cookies.containsKey(LOCALE_COOKIE)) {
+            FacesContext.getCurrentInstance().getViewRoot().setLocale(new Locale(arg_locale));
+            return;
+        }
+        in_locale = ((Cookie)cookies.get(LOCALE_COOKIE)).getValue();
+        locale = in_locale.equals(EN) ? EN : SI;
+        FacesContext.getCurrentInstance().getViewRoot().setLocale(new Locale(locale));
+    }
+
     public Naloga2() {
+        setLocale(SI);
         start();
     }
 
@@ -182,7 +209,8 @@ public class Naloga2 {
        for (VehicleBean vehicle : newVehicles) {
            vehiclesInDb.put(vehicle.getHash(), true);
        }
-       countVehicles();
+
+       refresh();
     }
 
     /*
@@ -227,11 +255,23 @@ public class Naloga2 {
             logger.error(errorMsg);
             return;
         }
-        removeVehiclesFromFile();
         errorMsg = "";
+        removeVehiclesFromFile();
         loadVehiclesFromFile();
         sortVehicles();
         countVehicles();
+    }
+
+    public void changeLanguage() {
+        locale = locale.equals(SI) ? EN : SI;
+        Map<String, Object> cookieProps = new HashMap<String, Object>();
+        // Remember language for 1 year.
+        cookieProps.put("maxAge", new Integer(365 * 24 * 60 * 60));
+        FacesContext.getCurrentInstance()
+            .getExternalContext()
+            .addResponseCookie(LOCALE_COOKIE, locale, cookieProps);
+
+        refresh();
     }
 
     public Map<String, Boolean> getVehiclesInDb() {
@@ -243,7 +283,7 @@ public class Naloga2 {
     }
 
     public boolean getIsDataValid() {
-        return isDataValid;
+        return (0 < numVehicles);
     }
 
     public Integer getNumVehicles() {
@@ -259,10 +299,14 @@ public class Naloga2 {
     }
 
     public boolean getAnyInDb() {
-        return anyInDb;
+        return vehiclesInDb.values().contains(true);
     }
 
     public boolean getAnyInFile() {
-        return anyInFile;
+        return vehiclesInDb.values().contains(false);
+    }
+
+    public String getLocale() {
+        return locale;
     }
 }

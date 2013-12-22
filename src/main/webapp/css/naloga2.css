@@ -108,7 +108,7 @@ h2 a:hover {
     margin-top: 20px;
     float: left;
     height: 24px;
-    width: 600px;
+    width: 55%;
     overflow: hidden;
 }
 
@@ -136,4 +136,24 @@ h2 a:hover {
 
 .loader {
     display: none;
+}
+
+.langButton {
+    margin-top: 20px;
+    float: right;
+}
+
+input[type=submit], input[type=button] {
+    border: 1px solid #8e8e8e;
+    border-radius: 4px;
+    background: #e3e3e3;
+    background: -moz-linear-gradient(top, #e3e3e3 0%, #9f9f9f 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e3e3e3), color-stop(100%,#9f9f9f));
+    background: -webkit-linear-gradient(top, #e3e3e3 0%,#9f9f9f 100%);
+    background: -o-linear-gradient(top, #e3e3e3 0%, #9f9f9f 100%);
+    background: -ms-linear-gradient(top, #e3e3e3 0%, #9f9f9f 100%);
+    background: linear-gradient(top, #e3e3e3 0%,#9f9f9f 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e3e3e3', endColorstr='#9f9f9f',GradientType=0 );
+    font-size: 14px;
+    font-weight: bold;
 }

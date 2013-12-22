@@ -8,8 +8,7 @@ public class VehicleBean {
     private Double price;
     private String hash;
 
-    public VehicleBean() {
-    }
+    public VehicleBean() {}
 
     public VehicleBean(final Integer year,
                        final String make,

@@ -5,14 +5,16 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:t="http://myfaces.apache.org/tomahawk">
   <h:head>
-    <f:view locale="si">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <f:view locale="#{naloga2.locale}">
       <title>#{lang['task2']}</title>
     </f:view>
     <link href="./css/naloga2.css" rel="stylesheet" type="text/css" />
   </h:head>
   <script type="text/javascript" src="./js/jquery-2.0.3.min.js"></script>
   <h:body>
-    <f:view locale="si">
+    <f:view locale="#{naloga2.locale}">
+
       <h2><a href="/">#{lang['list']}</a></h2>
       <div class="error">
         <img class="loader" src="./img/loader.gif" width="24" />
@@ -79,8 +81,10 @@
         <h:commandButton class="uploadButton" value="#{lang['upload']}" action="#{naloga2.upload}" />
         <h:panelGroup class="fileText" layout="block" />
       </h:form>
-
+      <h:form>
+        <h:commandButton class="langButton" value="#{lang['lang']}" action="#{naloga2.changeLanguage}" />
+      </h:form>
+      <script type="text/javascript" src="./js/naloga2.js"></script>
     </f:view>
-    <script type="text/javascript" src="./js/naloga2.js"></script>
   </h:body>
 </html>
