@@ -14,24 +14,25 @@
   <h:body>
     <f:view locale="si">
       <h2><a href="/">#{lang['list']}</a></h2>
-      <h:panelGroup rendered="#{!naloga2.isDataValid}">
-        <h4>#{lang['file_error']}</h4>
-      </h:panelGroup>
-
+      <div class="error">
+        <img class="loader" src="./img/loader.gif" width="24" />
+        <span class="errorText">#{naloga2.errorMsg}</span>
+      </div>
+      
       <h:form rendered="#{naloga2.isDataValid}">
         #{lang['num_vehicles']}: #{naloga2.numVehicles}
 
         <h:dataTable value="#{naloga2.vehicles}" var="vehicle"
                      styleClass="employeeTable"
                      headerClass="employeeTableHeader"
-                     rowClasses="employeeTableOddRow,employeeTableEvenRow"
+                     rowClasses="employeeTableRowOdd,employeeTableRowEven"
                      columnClasses="checkBox,dbState,colMiddle,colMiddle,colMiddle,colMiddle,colPrice">
           <h:column headerClass="employeeTableHeader selectHeader">
             <f:facet name="header"><h:selectBooleanCheckbox name="selectAll" id="selectAll" /></f:facet>
             <h:selectBooleanCheckbox
                name="select"
-               rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}"
-               value="#{naloga2.checkedVehicles[vehicle.hash]}" />
+               value="#{naloga2.checkedVehicles[vehicle.hash]}"
+               rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}" />
           </h:column>
           <h:column headerClass="employeeTableHeader dbHeader">
             <f:facet name="header">#{lang['in_database']}</f:facet>
@@ -61,13 +62,22 @@
             </h:outputText>
           </h:column>
         </h:dataTable>
-        <h:commandButton value="#{lang['store']}" action="#{naloga2.storeVehicles}" styleClass="storeButton" />
-        <h:commandButton value="#{lang['empty_database']}" action="#{naloga2.removeVehicles}" styleClass="emptyButton" />
+        <h:commandButton value="#{lang['store']}"
+                         action="#{naloga2.storeVehicles}"
+                         styleClass="storeButton"
+                         disabled="#{!naloga2.anyInFile}" 
+                         update="@form" />
+        <h:commandButton value="#{lang['empty_database']}"
+                         action="#{naloga2.removeVehicles}"
+                         styleClass="emptyButton"
+                         disabled="#{!naloga2.anyInDb}" />
       </h:form>
 
+      <h:button id="browseButton" value="#{lang['browse']}" onclick="return false;" />
       <h:form enctype="multipart/form-data" styleClass="uploadForm">
-        <t:inputFileUpload value="#{naloga2.uploadedFile}" />
-        <h:commandButton value="#{lang['upload']}" action="#{naloga2.upload}"/>
+        <t:inputFileUpload id="fileInput" value="#{naloga2.uploadedFile}" style="display: none" />
+        <h:commandButton class="uploadButton" value="#{lang['upload']}" action="#{naloga2.upload}" />
+        <h:panelGroup class="fileText" layout="block" />
       </h:form>
 
     </f:view>
