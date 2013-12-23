@@ -91,10 +91,10 @@
               <f:facet name="header">#{lang['comment']}</f:facet>
               #{vehicle.comment}
             </h:column>
-            <h:column headerClass="employeeTableHeader headerMiddle">
+            <h:column headerClass="employeeTableHeader headerMiddle price">
               <f:facet name="header">#{lang['price']}</f:facet>
               <h:outputText value="#{vehicle.price}">
-                <f:convertNumber pattern="0.00" />
+                <f:convertNumber minFractionDigits="2" locale="#{naloga2.locale}" />
               </h:outputText>
             </h:column>
           </h:dataTable>

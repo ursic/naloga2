@@ -31,6 +31,9 @@ public class Naloga2 {
 
     // Holder of all vehicles. From CSV and database.
     ArrayList<VehicleBean> vehicles = new ArrayList<VehicleBean>();
+
+//    ArrayList<VehicleBean> viewVehicles = new ArrayList<VehicleBean>();
+
     private Integer numVehicles = 0;  // Total number of vehicles.
     // List of all vehicles. Those stored in the database have the value of "true".
     private Map<String, Boolean> vehiclesInDb = new HashMap<String, Boolean>();
@@ -40,8 +43,8 @@ public class Naloga2 {
     private UploadedFile uploadedFile = null;
     private String errorMsg;
     private final String RESOURCE_BUNDLE = "Lang";
-    private final String SI = "si";
-    private final String EN = "en";
+    private final String SI = "sl_SI";
+    private final String EN = "en_US";
     private final String LOCALE_COOKIE = "lang";
     private String locale = SI;
 
@@ -231,12 +234,12 @@ public class Naloga2 {
             return;
         }
 
-        // Update vehicles' statuses.
-       for (VehicleBean vehicle : newVehicles) {
-           vehiclesInDb.put(vehicle.getHash(), true);
-       }
-
-       refresh();
+        vehicles.clear();
+        vehiclesInDb.clear();
+        loadVehiclesFromDb();
+        loadVehiclesFromFile();
+        sortVehicles();
+        countVehicles();
     }
 
     /**
@@ -326,6 +329,10 @@ public class Naloga2 {
     public ArrayList<VehicleBean> getVehicles() {
         return vehicles;
     }
+
+    // public ArrayList<VehicleBean> getViewVehicles() {
+    //     return viewVehicles;
+    // }
 
     public String getErrorMsg() {
         return errorMsg;

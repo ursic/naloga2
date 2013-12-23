@@ -7,8 +7,8 @@
     version="2.0">
   <application>
     <locale-config>
-      <supported-locale>si</supported-locale>
-      <supported-locale>en</supported-locale>
+      <supported-locale>sl_SI</supported-locale>
+      <supported-locale>en_US</supported-locale>
     </locale-config>
     <resource-bundle>
       <base-name>Lang</base-name>
