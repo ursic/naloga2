@@ -1,8 +1,24 @@
 body
 {
-    margin: 30px 5% 0 5%;
+    margin: 30px 5% 10% 5%;
     background-color: #ebebeb;
     font-family: Helvetica, "Sans-serif";
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.clear {
+    clear: both;
+}
+
+.mb20 {
+    margin-bottom: 20px;
 }
 
 table {
@@ -85,12 +101,15 @@ h2 a:hover {
 }
 
 .storeButton {
-    margin: 20px 20px 0 0;
-    float: left;
+    margin: 10px 20px 0 0;
 }
 
-.emptyButton  {
-    margin: 20px 20px 0 0;
+.ebt {
+    margin: 20px 40px 0 0;
+}
+
+.ebb {
+    margin: 10px 25px 0 0;
     float: left;
 }
 
@@ -104,29 +123,43 @@ h2 a:hover {
     padding-left: 10px;
 }
 
+.uft {
+    float: left;
+    width: 68%;
+}
+
 .uploadForm {
-    margin-top: 20px;
+    margin-top: 10px;
     float: left;
     height: 24px;
     width: 55%;
     overflow: hidden;
 }
 
-#browseButton {
-    margin: 20px 10px 0 0;
+.browseButton {
+    float: left;
+}
+
+.bbt {
+    margin: 0 20px 0 0;
+    float: left;
+}
+
+.bbb {
+    margin: 10px 10px 0 0;
     float: left;
 }
 
 .uploadButton {
-    margin-top: 0px;
-    float: left;
+    margin: 0 10px 0 0;
+    float: left; 
 }
 
 .fileText {
-    margin-left: 10px;
     float: left;
     height: 20px;
-    width: 85%;
+    width: 70%;
+    overflow: hidden;
 }
 
 .error {
@@ -139,7 +172,7 @@ h2 a:hover {
 }
 
 .langButton {
-    margin-top: 20px;
+    margin-top: 10px;
     float: right;
 }
 
@@ -156,4 +189,25 @@ input[type=submit], input[type=button] {
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e3e3e3', endColorstr='#9f9f9f',GradientType=0 );
     font-size: 14px;
     font-weight: bold;
+}
+
+.navContainer {
+    margin: 5px 0 10px 0;
+    width: 100%;
+    height: 20px;
+}
+
+.nav {
+    margin: 0 0 0 235px;
+    height: 20px;
+}
+
+.lbt {
+    margin: 0;
+    float: right;
+}
+
+.nav2 {
+    margin-top: -50px;
+    float: left;
 }

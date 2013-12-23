@@ -23,10 +23,15 @@ public class Uploader {
     public boolean storeUploadedFile(UploadedFile uploadedFile, String outFilePath) {
         try {
             String contentType = uploadedFile.getContentType();
-            if (!contentType.equals("text/plain")) {
+
+System.out.println("ct " + contentType);
+
+            if (!contentType.equals("text/plain") &&
+                !contentType.equals("text/csv")) {
                 logger.error("Uploaded file is of wrong MIME type.");
                 return false;
             }
+
             PrintWriter out = new PrintWriter(outFilePath);
             out.println(new String(uploadedFile.getBytes()));
             out.close();

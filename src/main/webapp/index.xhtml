@@ -20,64 +20,98 @@
         <img class="loader" src="./img/loader.gif" width="24" />
         <span class="errorText">#{naloga2.errorMsg}</span>
       </div>
-      
-      <h:form rendered="#{naloga2.isDataValid}">
+
+      <h:panelGroup rendered="#{naloga2.isDataValid}">
         #{lang['num_vehicles']}: #{naloga2.numVehicles}
+      </h:panelGroup>
 
-        <h:dataTable value="#{naloga2.vehicles}" var="vehicle"
-                     styleClass="employeeTable"
-                     headerClass="employeeTableHeader"
-                     rowClasses="employeeTableRowOdd,employeeTableRowEven"
-                     columnClasses="checkBox,dbState,colMiddle,colMiddle,colMiddle,colMiddle,colPrice">
-          <h:column headerClass="employeeTableHeader selectHeader">
-            <f:facet name="header"><h:selectBooleanCheckbox name="selectAll" id="selectAll" /></f:facet>
-            <h:selectBooleanCheckbox
-               name="select"
-               value="#{naloga2.checkedVehicles[vehicle.hash]}"
-               rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}" />
-          </h:column>
-          <h:column headerClass="employeeTableHeader dbHeader">
-            <f:facet name="header">#{lang['in_database']}</f:facet>
-            <h:outputText value="#{lang['yes']}" rendered="#{naloga2.vehiclesInDb[vehicle.hash]}" />
-            <h:outputText value="#{lang['no']}" rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}" />
-          </h:column>
-          <h:column headerClass="employeeTableHeader yearHeader headerMiddle">
-            <f:facet name="header">#{lang['year']}</f:facet>
-            #{vehicle.year}
-          </h:column>
-          <h:column headerClass="employeeTableHeader headerMiddle">
-            <f:facet name="header">#{lang['make']}</f:facet>
-            #{vehicle.make}
-          </h:column>
-          <h:column headerClass="employeeTableHeader headerMiddle">
-            <f:facet name="header">#{lang['model']}</f:facet>
-            #{vehicle.model}
-          </h:column>
-          <h:column headerClass="employeeTableHeader headerMiddle">
-            <f:facet name="header">#{lang['comment']}</f:facet>
-            #{vehicle.comment}
-          </h:column>
-          <h:column headerClass="employeeTableHeader headerMiddle">
-            <f:facet name="header">#{lang['price']}</f:facet>
-            <h:outputText value="#{vehicle.price}">
-              <f:convertNumber pattern="0.00" />
-            </h:outputText>
-          </h:column>
-        </h:dataTable>
-        <h:commandButton value="#{lang['store']}"
-                         action="#{naloga2.storeVehicles}"
-                         styleClass="storeButton"
-                         disabled="#{!naloga2.anyInFile}" 
-                         update="@form" />
-        <h:commandButton value="#{lang['empty_database']}"
-                         action="#{naloga2.removeVehicles}"
-                         styleClass="emptyButton"
-                         disabled="#{!naloga2.anyInDb}" />
+      <h:panelGroup rendered="#{20 le naloga2.numVehicles}">
+
+        <div class="navContainer">
+          <div class="nav">
+            <h:button class="browseButton bbt" value="#{lang['browse']}" onclick="return false;" />
+            <h:form enctype="multipart/form-data" class="uft">
+              <t:inputFileUpload class="fit" id="fileInput" style="display: none;" value="#{naloga2.uploadedFile}" />
+              <h:commandButton class="uploadButton" value="#{lang['upload']}" action="#{naloga2.upload}" />
+              <div class="fileText"></div>
+            </h:form>
+            <h:form>
+              <h:commandButton class="lbt" value="#{lang['lang']}" action="#{naloga2.changeLanguage}" />
+            </h:form>
+          </div>
+        </div>
+      </h:panelGroup>
+
+      <h:form rendered="#{naloga2.isDataValid}">
+        <div>
+          <div class="nav2">
+            <h:panelGroup rendered="#{20 le naloga2.numVehicles}">
+              <h:commandButton value="#{lang['store']}"
+                               action="#{naloga2.storeVehicles}"
+                               styleClass="storeButton"
+                               disabled="#{!naloga2.anyInFile}" 
+                               update="@form" />
+              <h:commandButton value="#{lang['empty_database']}"
+                               action="#{naloga2.removeVehicles}"
+                               styleClass="emptyButton ebt"
+                               disabled="#{!naloga2.anyInDb}" />
+            </h:panelGroup>
+          </div>
+          <div class="clear"></div>
+          <h:dataTable value="#{naloga2.vehicles}" var="vehicle"
+                       styleClass="employeeTable"
+                       headerClass="employeeTableHeader"
+                       rowClasses="employeeTableRowOdd,employeeTableRowEven"
+                       columnClasses="checkBox,dbState,colMiddle,colMiddle,colMiddle,colMiddle,colPrice">
+            <h:column headerClass="employeeTableHeader selectHeader">
+              <f:facet name="header"><h:selectBooleanCheckbox name="selectAll" id="selectAll" /></f:facet>
+              <h:selectBooleanCheckbox
+                 name="select"
+                 value="#{naloga2.checkedVehicles[vehicle.hash]}"
+                 rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}" />
+            </h:column>
+            <h:column headerClass="employeeTableHeader dbHeader">
+              <f:facet name="header">#{lang['in_database']}</f:facet>
+              <h:outputText value="#{lang['yes']}" rendered="#{naloga2.vehiclesInDb[vehicle.hash]}" />
+              <h:outputText value="#{lang['no']}" rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}" />
+            </h:column>
+            <h:column headerClass="employeeTableHeader yearHeader headerMiddle">
+              <f:facet name="header">#{lang['year']}</f:facet>
+              #{vehicle.year}
+            </h:column>
+            <h:column headerClass="employeeTableHeader headerMiddle">
+              <f:facet name="header">#{lang['make']}</f:facet>
+              #{vehicle.make}
+            </h:column>
+            <h:column headerClass="employeeTableHeader headerMiddle">
+              <f:facet name="header">#{lang['model']}</f:facet>
+              #{vehicle.model}
+            </h:column>
+            <h:column headerClass="employeeTableHeader headerMiddle">
+              <f:facet name="header">#{lang['comment']}</f:facet>
+              #{vehicle.comment}
+            </h:column>
+            <h:column headerClass="employeeTableHeader headerMiddle">
+              <f:facet name="header">#{lang['price']}</f:facet>
+              <h:outputText value="#{vehicle.price}">
+                <f:convertNumber pattern="0.00" />
+              </h:outputText>
+            </h:column>
+          </h:dataTable>
+          <h:commandButton value="#{lang['store']}"
+                           action="#{naloga2.storeVehicles}"
+                           styleClass="storeButton left"
+                           disabled="#{!naloga2.anyInFile}" 
+                           update="@form" />
+          <h:commandButton value="#{lang['empty_database']}"
+                           action="#{naloga2.removeVehicles}"
+                           styleClass="emptyButton ebb"
+                           disabled="#{!naloga2.anyInDb}" />
+        </div>
       </h:form>
-
-      <h:button id="browseButton" value="#{lang['browse']}" onclick="return false;" />
+      <h:button class="browseButton bbb" value="#{lang['browse']}" onclick="return false;" />
       <h:form enctype="multipart/form-data" styleClass="uploadForm">
-        <t:inputFileUpload id="fileInput" value="#{naloga2.uploadedFile}" style="display: none" />
+        <t:inputFileUpload class="fib" id="fileInput" value="#{naloga2.uploadedFile}" style="display: none" />
         <h:commandButton class="uploadButton" value="#{lang['upload']}" action="#{naloga2.upload}" />
         <h:panelGroup class="fileText" layout="block" />
       </h:form>
