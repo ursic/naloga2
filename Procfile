@@ -1,0 +1,1 @@
+web:    java $JAVA_OPTS -jar webapp-runner.jar --port 80 naloga2.war
