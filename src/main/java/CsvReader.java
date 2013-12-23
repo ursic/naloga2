@@ -89,9 +89,9 @@ public class CsvReader {
         while (continueReading) {
             try {
                 vehicle = beanReader.read(VehicleBean.class, header, processors);
-                continueReading = (vehicle != null);
+                continueReading = (null != vehicle);
 
-                if (null != vehicle) {
+                if (continueReading) {
                     vehicle.setHash();
                     vehicles.add(vehicle);
                 }
