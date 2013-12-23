@@ -1,1 +1,1 @@
-web:    java $JAVA_OPTS -jar webapp-runner.jar --port 80 naloga2.war
+web:    java $JAVA_OPTS -jar target/naloga2-1.0-SNAPSHOT/WEB-INF/lib/webapp-runner-7.0.40.0.jar --port 80 target/naloga2-1.0-SNAPSHOT.war
