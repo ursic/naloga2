@@ -14,6 +14,12 @@ import org.slf4j.*;
 public class Uploader {
     Logger logger = LoggerFactory.getLogger(getClass());
 
+    /**
+     * Stores given file onto given path on disk.
+     * @param uploadedFile file to store
+     * @param outFilePath path to store the file to
+     * @return true on success, false otherwise
+     */
     public boolean storeUploadedFile(UploadedFile uploadedFile, String outFilePath) {
         try {
             String contentType = uploadedFile.getContentType();

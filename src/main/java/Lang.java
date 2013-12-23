@@ -10,6 +10,9 @@ import java.util.ResourceBundle;
 
 import javax.faces.context.FacesContext;
 
+/*
+ * Returns text in UTF-8 from resource files.
+ */
 public class Lang extends ResourceBundle {
 
     protected static final String BUNDLE_NAME = "naloga2";
@@ -36,8 +39,6 @@ public class Lang extends ResourceBundle {
             (String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
                 throws IllegalAccessException, InstantiationException, IOException
         {
-            // The below code is copied from default Control#newBundle() implementation.
-            // Only the PropertyResourceBundle line is changed to read the file as UTF-8.
             String bundleName = toBundleName(baseName, locale);
             String resourceName = toResourceName(bundleName, BUNDLE_EXTENSION);
             ResourceBundle bundle = null;
@@ -64,5 +65,4 @@ public class Lang extends ResourceBundle {
             return bundle;
         }
     }
-
 }

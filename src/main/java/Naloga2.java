@@ -11,14 +11,14 @@ import org.apache.myfaces.custom.fileupload.UploadedFile;
 import org.slf4j.*;
 
 interface Errors {
-    String FILE_ERROR = "file_error";
+    String FILE_ERROR      = "file_error";
     String FILE_WRONG_TYPE = "file_wrong_type";
-    String FILE_EMPTY = "file_empty";
-    String NONE_CHOSEN = "none_chosen";
-    String TABLE_STORE = "table_store_error";
-    String VEHICLE_STORE = "vehicle_store_error";
-    String REMOVE = "error_removing";
-    String DB = "db_error";
+    String FILE_EMPTY      = "file_empty";
+    String NONE_CHOSEN     = "none_chosen";
+    String TABLE_STORE     = "table_store_error";
+    String VEHICLE_STORE   = "vehicle_store_error";
+    String REMOVE          = "error_removing";
+    String DB              = "db_error";
 }
 
 @ManagedBean
@@ -45,6 +45,9 @@ public class Naloga2 {
     private final String LOCALE_COOKIE = "lang";
     private String locale = SI;
 
+    /**
+     * Loads vehicle from database into array 'vehicles'.
+     */
     private void loadVehiclesFromDb() {
         QueryResult qr = db.getVehicles();
 
@@ -64,10 +67,9 @@ public class Naloga2 {
         }
     }
 
-    /*
-     * Load vehicle data from file.
-     * Load only those that aren't already
-     * loaded from the database.
+    /**
+     * Loads vehicle data from CSV file on disk into array 'vehicles'.
+     * Skips those already in the database.
      */
     private void loadVehiclesFromFile() {
         ArrayList<VehicleBean> newVehicles;
@@ -96,8 +98,8 @@ public class Naloga2 {
         }
     }
 
-    /*
-     * Remove vehicles which are not in the database.
+    /**
+     * Removes vehicles which were loaded from a file.
      */
     private void removeVehiclesFromFile() {
         ArrayList<VehicleBean> newVehicles = new ArrayList<VehicleBean>();
@@ -112,16 +114,28 @@ public class Naloga2 {
         vehicles = newVehicles;
     }
 
+    /**
+     * Returns text that corresponds to given key from a resource file.
+     * @param  which key associated to wanted string
+     * @return       string associated with given key
+     */
     private String getMsg(String which) {
         ResourceBundle rb = ResourceBundle.getBundle(RESOURCE_BUNDLE, new Locale(locale));
         return rb.getString(which);
     }
 
+    /**
+     * Count vehicles and store total into 'numVehicles'.
+     * Set error message if there isn't any.
+     */
     private void countVehicles() {
         numVehicles = vehicles.size();
         errorMsg = (numVehicles <= 0) ? getMsg(Errors.FILE_ERROR) : errorMsg;
     }
 
+    /**
+     * Initialize the application.
+     */
     private void start() {
         errorMsg = "";
         loadVehiclesFromDb();
@@ -130,6 +144,9 @@ public class Naloga2 {
         countVehicles();
     }
 
+    /**
+     * Refresh the page.
+     */
     private void refresh() {
        try {
            FacesContext.getCurrentInstance().getExternalContext().redirect("/");
@@ -138,7 +155,7 @@ public class Naloga2 {
        }
     }
 
-    /*
+    /**
      * Sort vehicles by year in descending order.
      */
     private void sortVehicles() {
@@ -154,6 +171,11 @@ public class Naloga2 {
         });
     }
 
+    /**
+     * Set locale to that found in the 'lang' cookie.
+     * If none found, set locale to the given one.
+     * @param arg_locale given locale
+     */
     private void setLocale(String arg_locale) {
         String in_locale;
         Map<String, Object> cookies = FacesContext.getCurrentInstance()
@@ -172,6 +194,9 @@ public class Naloga2 {
         start();
     }
 
+    /**
+     * Store selected vehicles from 'vehicles' array into database.
+     */
     public void storeVehicles() {
         ArrayList<VehicleBean> newVehicles = new ArrayList<VehicleBean>();
 
@@ -183,6 +208,7 @@ public class Naloga2 {
             return;
         }
 
+        // Get list of selected vehicles.
         for (VehicleBean vehicle : vehicles) {
             if (checkedVehicles.containsKey(vehicle.getHash()) &&
                 checkedVehicles.get(vehicle.getHash()) &&
@@ -213,7 +239,7 @@ public class Naloga2 {
        refresh();
     }
 
-    /*
+    /**
      * Remove vehicles from the database.
      */
     public void removeVehicles() {
@@ -241,6 +267,10 @@ public class Naloga2 {
         return uploadedFile;
     }
 
+    /**
+     * Store uploaded 'CSV' file onto disk.
+     * Load vehicles from the stored disk.
+     */
     public void upload() {
         Uploader uploader = new Uploader();
 
@@ -262,6 +292,9 @@ public class Naloga2 {
         countVehicles();
     }
 
+    /**
+     * Toggle current locale.
+     */
     public void changeLanguage() {
         locale = locale.equals(SI) ? EN : SI;
         Map<String, Object> cookieProps = new HashMap<String, Object>();

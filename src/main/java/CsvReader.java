@@ -17,7 +17,8 @@ public class CsvReader {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
-     * Cell processor for year.
+     * Processes given year string into integer.
+     * Valid year is within given (min, max) limits.
      */
     private static class ParseYear extends CellProcessorAdaptor {
         static Integer min;
@@ -45,6 +46,10 @@ public class CsvReader {
         }
     }
 
+    /**
+     * Returns processors for parsing vehicle CSV file.
+     * @return processors for parsing vehicle CSV file.
+     */
     private static CellProcessor[] getProcessors() {
         final CellProcessor[] processors = new CellProcessor[] { 
             new ParseYear(1800,
@@ -57,6 +62,12 @@ public class CsvReader {
         return processors;
     }
 
+    /**
+     * Returns array of vehicle objects parsed from file given
+     * by the file path.
+     * @param filePath path to the CSV file with vehicle records
+     * @return         array of vehicle objects
+     */
     public ArrayList<VehicleBean> read(String filePath) throws Exception {
         ICsvBeanReader beanReader = null;
         final String[] header;

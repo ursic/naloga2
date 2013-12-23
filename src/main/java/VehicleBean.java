@@ -116,6 +116,9 @@ public class VehicleBean {
                              year, make, model, comment, price);
     }
 
+    /**
+     * Serializes, hashes and stores the hash of the current instance.
+     */
     public void setHash() {
         StringBuffer sb = new StringBuffer();
         try {

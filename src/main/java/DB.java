@@ -20,14 +20,17 @@ class QueryResult {
 
 class DB {
     private final String VEHICLES_SQL = "naloga2.sql";
+    private final String DB_NAME = "naloga2db";
+    private final String USERNAME = "admin";
+    private final String PASSWORD = "password";
 
     private Connection conn;
 
     private void connect()
        throws Exception {
         Class.forName("org.h2.Driver");
-        String path = System.getProperty("java.io.tmpdir") + File.separator + "naloga2_db";
-        conn = DriverManager.getConnection("jdbc:h2:" + path, "mitja", "dbnaloga2");
+        String path = System.getProperty("java.io.tmpdir") + File.separator + DB_NAME;
+        conn = DriverManager.getConnection("jdbc:h2:" + path, USERNAME, PASSWORD);
     }
 
     private boolean disconnect() {
@@ -41,6 +44,9 @@ class DB {
         return true;
     }
 
+    /**
+     * Creates vehicle table.
+     */
     public QueryResult createTable() {
         QueryResult qr = new QueryResult();
         try {
@@ -60,6 +66,11 @@ class DB {
         return qr;
     }
 
+    /**
+     * Inserts given vehicle objects into vehicle table.
+     * @param vehicles to insert
+     * @return result object
+     */
     public QueryResult storeVehicles(ArrayList<VehicleBean> vehicles) {
         QueryResult qr = new QueryResult();
         String query = "INSERT INTO vehicles (year, make, model, comment, price) VALUES";
@@ -93,6 +104,10 @@ class DB {
         return qr;
     }
 
+    /**
+     * Selects all vehicles from vehicle table.
+     * @return result object
+     */
     public QueryResult getVehicles() {
         QueryResult qr = new QueryResult();
         String query = "SELECT year, make, model, comment, price FROM vehicles";
@@ -125,6 +140,10 @@ class DB {
         return qr;
     }
 
+    /**
+     * Empties vehicle table.
+     * @return result object
+     */
     public QueryResult removeVehicles() {
         QueryResult qr = new QueryResult();
         String query = "DELETE FROM vehicles";
