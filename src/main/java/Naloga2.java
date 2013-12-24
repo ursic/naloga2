@@ -43,8 +43,9 @@ public class Naloga2 {
     private UploadedFile uploadedFile = null;
     private String errorMsg;
     private final String RESOURCE_BUNDLE = "Lang";
-    private final String SI = "sl_SI";
-    private final String EN = "en_US";
+    private final String SI = "sl";
+    private final String EN = "en";
+    private final Map<String, String> webLocale = new HashMap<String, String>();
     private final String LOCALE_COOKIE = "lang";
     private String locale = SI;
 
@@ -123,7 +124,11 @@ public class Naloga2 {
      * @return       string associated with given key
      */
     private String getMsg(String which) {
+
+System.out.println("locale " + locale);
+
         ResourceBundle rb = ResourceBundle.getBundle(RESOURCE_BUNDLE, new Locale(locale));
+//        ResourceBundle rb = ResourceBundle.getBundle(RESOURCE_BUNDLE);
         return rb.getString(which);
     }
 
