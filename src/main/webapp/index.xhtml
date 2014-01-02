@@ -59,7 +59,6 @@
           <div class="nav2">
             <h:panelGroup rendered="#{20 le naloga2.numVehicles}">
               <h:commandButton value="#{lang['store']}"
-                               action="#{naloga2.storeVehicles}"
                                styleClass="storeButton"
                                disabled="#{!naloga2.anyInFile}" 
                                update="@form" />
@@ -67,9 +66,9 @@
           </div>
           <div class="clear"></div>
 
-          <p:dataTable id="multiCars" var="vehicle" value="#{naloga2.vehicleModel}"
+          <p:dataTable var="vehicle" value="#{naloga2.vehicleModel}"
                        selection="#{naloga2.selectedVehicles}">
-            <p:column selectionMode="multiple" style="width:2%" rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}" />
+            <p:column class="checkBox" selectionMode="multiple" rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}" />
             <p:column class="ui-selection-column" rendered="#{naloga2.vehiclesInDb[vehicle.hash]}" />
             <p:column class="dbHeader" headerText="#{lang['in_database']}">
               <h:outputText value="#{lang['yes']}" rendered="#{naloga2.vehiclesInDb[vehicle.hash]}" />
