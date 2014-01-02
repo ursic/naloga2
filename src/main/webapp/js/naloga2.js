@@ -1,9 +1,3 @@
-function set_select_all_listener() {
-    $("[id*='selectAll']").click(function() {
-        $('.checkBox').find('input:checkbox').prop('checked', $(this).prop('checked'));
-    });    
-}
-
 function set_upload_form_listener() {
     $('.browseButton.bbt').click(function() {
         $("[class='fit']").click().change(function() {
@@ -26,19 +20,7 @@ function set_button_listeners() {
     });
 }
 
-function set_check_row_listener() {
-    $("[class*='employeeTableRow']").click(function() {
-        $(this).find('input').prop('checked', function(i, val ) {
-            return !val;});
-    });
-    $('input:checkbox').click(function(e) {
-        e.stopPropagation();
-    });
-}
-
 $(document).ready(function() {
-    set_select_all_listener();
     set_upload_form_listener();
     set_button_listeners();
-    set_check_row_listener();
 });
