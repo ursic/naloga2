@@ -101,8 +101,6 @@ public class Naloga2 {
                 vehiclesInDb.put(vehicle.getHash(), false);
             }
         }
-
-        vehicleModel = new VehicleDataModel(vehicles);
     }
 
     /**
@@ -148,7 +146,6 @@ public class Naloga2 {
         loadVehiclesFromFile();
         sortVehicles();
         countVehicles();
-
         vehicleModel = new VehicleDataModel(vehicles);
     }
 
@@ -214,10 +211,12 @@ public class Naloga2 {
             return;
         }
 
-        // None of the vehicles are in the DB anymore.
-        for (VehicleBean vehicle : vehicles) {
-            vehiclesInDb.put(vehicle.getHash(), false);
-        }
+        vehicles.clear();
+        vehiclesInDb.clear();
+        loadVehiclesFromFile();
+        vehicleModel = new VehicleDataModel(vehicles);
+        countVehicles();
+        sortVehicles();
     }
 
     public void setUploadedFile(UploadedFile uploadedFile) {
@@ -246,11 +245,13 @@ public class Naloga2 {
             logger.error(errorMsg);
             return;
         }
+
         errorMsg = "";
         removeVehiclesFromFile();
         loadVehiclesFromFile();
         sortVehicles();
         countVehicles();
+        vehicleModel = new VehicleDataModel(vehicles);
     }
 
     /**
