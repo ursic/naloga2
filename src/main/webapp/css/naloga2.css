@@ -105,7 +105,8 @@ h2 a:hover {
 }
 
 .ebt {
-    margin: 20px 40px 0 0;
+    margin: 0 25px 0 0;
+    float: left;
 }
 
 .ebb {
@@ -125,7 +126,7 @@ h2 a:hover {
 
 .uft {
     float: left;
-    width: 68%;
+    width: 60%;
 }
 
 .uploadForm {
@@ -198,7 +199,7 @@ input[type=submit], input[type=button] {
 }
 
 .nav {
-    margin: 0 0 0 235px;
+    margin: 0 0 0 90px;
     height: 20px;
 }
 
@@ -208,6 +209,6 @@ input[type=submit], input[type=button] {
 }
 
 .nav2 {
-    margin-top: -50px;
+    margin-top: -40px;
     float: left;
 }

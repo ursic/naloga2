@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:t="http://myfaces.apache.org/tomahawk">
+      xmlns:t="http://myfaces.apache.org/tomahawk"
+      xmlns:p="http://primefaces.org/ui">
   <h:head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <f:view locale="#{naloga2.locale}">
@@ -13,6 +14,7 @@
   </h:head>
   <script type="text/javascript" src="./js/jquery-2.0.3.min.js"></script>
   <h:body>
+
     <f:view locale="#{naloga2.locale}">
 
       <h2><a href="/">#{lang['list']}</a></h2>
@@ -29,6 +31,14 @@
 
         <div class="navContainer">
           <div class="nav">
+
+            <h:form>
+              <h:commandButton value="#{lang['empty_database']}"
+                               action="#{naloga2.removeVehicles}"
+                               styleClass="emptyButton ebt"
+                               disabled="#{!naloga2.anyInDb}" />
+            </h:form>
+
             <h:button class="browseButton bbt" value="#{lang['browse']}" onclick="return false;" />
             <h:form enctype="multipart/form-data" class="uft">
               <t:inputFileUpload class="fit" id="fileInput" style="display: none;" value="#{naloga2.uploadedFile}" />
@@ -39,7 +49,9 @@
               <h:commandButton class="lbt" value="#{lang['lang']}" action="#{naloga2.changeLanguage}" />
             </h:form>
           </div>
+
         </div>
+          <div class="clear"></div>
       </h:panelGroup>
 
       <h:form rendered="#{naloga2.isDataValid}">
@@ -51,64 +63,43 @@
                                styleClass="storeButton"
                                disabled="#{!naloga2.anyInFile}" 
                                update="@form" />
-              <h:commandButton value="#{lang['empty_database']}"
-                               action="#{naloga2.removeVehicles}"
-                               styleClass="emptyButton ebt"
-                               disabled="#{!naloga2.anyInDb}" />
             </h:panelGroup>
           </div>
           <div class="clear"></div>
-          <h:dataTable value="#{naloga2.vehicles}" var="vehicle"
-                       styleClass="employeeTable"
-                       headerClass="employeeTableHeader"
-                       rowClasses="employeeTableRowOdd,employeeTableRowEven"
-                       columnClasses="checkBox,dbState,colMiddle,colMiddle,colMiddle,colMiddle,colPrice">
-            <h:column headerClass="employeeTableHeader selectHeader">
-              <f:facet name="header"><h:selectBooleanCheckbox name="selectAll" id="selectAll" /></f:facet>
-              <h:selectBooleanCheckbox
-                 name="select"
-                 value="#{naloga2.checkedVehicles[vehicle.hash]}"
-                 rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}" />
-            </h:column>
-            <h:column headerClass="employeeTableHeader dbHeader">
-              <f:facet name="header">#{lang['in_database']}</f:facet>
+
+          <p:dataTable id="multiCars" var="vehicle" value="#{naloga2.vehicleModel}"
+                       selection="#{naloga2.selectedVehicles}">
+            <p:column selectionMode="multiple" style="width:2%" rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}" />
+            <p:column class="ui-selection-column" rendered="#{naloga2.vehiclesInDb[vehicle.hash]}" />
+            <p:column class="dbHeader" headerText="#{lang['in_database']}">
               <h:outputText value="#{lang['yes']}" rendered="#{naloga2.vehiclesInDb[vehicle.hash]}" />
               <h:outputText value="#{lang['no']}" rendered="#{!naloga2.vehiclesInDb[vehicle.hash]}" />
-            </h:column>
-            <h:column headerClass="employeeTableHeader yearHeader headerMiddle">
-              <f:facet name="header">#{lang['year']}</f:facet>
-              #{vehicle.year}
-            </h:column>
-            <h:column headerClass="employeeTableHeader headerMiddle">
-              <f:facet name="header">#{lang['make']}</f:facet>
-              #{vehicle.make}
-            </h:column>
-            <h:column headerClass="employeeTableHeader headerMiddle">
-              <f:facet name="header">#{lang['model']}</f:facet>
-              #{vehicle.model}
-            </h:column>
-            <h:column headerClass="employeeTableHeader headerMiddle">
-              <f:facet name="header">#{lang['comment']}</f:facet>
-              #{vehicle.comment}
-            </h:column>
-            <h:column headerClass="employeeTableHeader headerMiddle price">
-              <f:facet name="header">#{lang['price']}</f:facet>
+            </p:column>
+            <p:column headerText="#{lang['year']}">#{vehicle.year}</p:column>
+            <p:column headerText="#{lang['make']}">#{vehicle.make}</p:column>
+            <p:column headerText="#{lang['model']}">#{vehicle.model}</p:column>
+            <p:column headerText="#{lang['comment']}">#{vehicle.comment}</p:column>
+            <p:column class="colPrice" headerText="#{lang['price']}">  
               <h:outputText value="#{vehicle.price}">
                 <f:convertNumber minFractionDigits="2" locale="#{naloga2.locale}" />
               </h:outputText>
-            </h:column>
-          </h:dataTable>
+            </p:column>
+          </p:dataTable>
           <h:commandButton value="#{lang['store']}"
-                           action="#{naloga2.storeVehicles}"
                            styleClass="storeButton left"
                            disabled="#{!naloga2.anyInFile}" 
                            update="@form" />
-          <h:commandButton value="#{lang['empty_database']}"
-                           action="#{naloga2.removeVehicles}"
-                           styleClass="emptyButton ebb"
-                           disabled="#{!naloga2.anyInDb}" />
         </div>
       </h:form>
+
+      <h:form rendered="#{naloga2.isDataValid}">
+        <h:commandButton value="#{lang['empty_database']}"
+                         action="#{naloga2.removeVehicles}"
+                         styleClass="emptyButton ebb"
+                         disabled="#{!naloga2.anyInDb}" />
+
+      </h:form>
+
       <h:button class="browseButton bbb" value="#{lang['browse']}" onclick="return false;" />
       <h:form enctype="multipart/form-data" styleClass="uploadForm">
         <t:inputFileUpload class="fib" id="fileInput" value="#{naloga2.uploadedFile}" style="display: none" />

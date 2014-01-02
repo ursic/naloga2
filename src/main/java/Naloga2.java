@@ -32,20 +32,21 @@ public class Naloga2 {
     // Holder of all vehicles. From CSV and database.
     ArrayList<VehicleBean> vehicles = new ArrayList<VehicleBean>();
 
-//    ArrayList<VehicleBean> viewVehicles = new ArrayList<VehicleBean>();
+    // Used for storing vehicles.
+    private VehicleDataModel vehicleModel;
+
+    // Populated when user selects records for storage.
+    ArrayList<VehicleBean> selectedVehicles = new ArrayList<VehicleBean>();
 
     private Integer numVehicles = 0;  // Total number of vehicles.
     // List of all vehicles. Those stored in the database have the value of "true".
     private Map<String, Boolean> vehiclesInDb = new HashMap<String, Boolean>();
-    // Populated when user selects records for storage.
-    private Map<String, Boolean> checkedVehicles = new HashMap<String, Boolean>();
 
     private UploadedFile uploadedFile = null;
     private String errorMsg;
     private final String RESOURCE_BUNDLE = "Lang";
     private final String SI = "sl";
     private final String EN = "en";
-    private final Map<String, String> webLocale = new HashMap<String, String>();
     private final String LOCALE_COOKIE = "lang";
     private String locale = SI;
 
@@ -54,7 +55,6 @@ public class Naloga2 {
      */
     private void loadVehiclesFromDb() {
         QueryResult qr = db.getVehicles();
-
         if (qr.error) {
             errorMsg = getMsg(Errors.DB);
             logger.error(errorMsg + " " + qr.errorMsg());
@@ -84,7 +84,8 @@ public class Naloga2 {
             CsvReader csv = new CsvReader();
             newVehicles = csv.read(filePath);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            errorMsg = getMsg(Errors.FILE_ERROR);
+            logger.error(errorMsg + ' ' + e.getMessage());
             return;
         }
 
@@ -100,6 +101,8 @@ public class Naloga2 {
                 vehiclesInDb.put(vehicle.getHash(), false);
             }
         }
+
+        vehicleModel = new VehicleDataModel(vehicles);
     }
 
     /**
@@ -112,7 +115,6 @@ public class Naloga2 {
                 newVehicles.add(vehicle);
             } else {
                 vehiclesInDb.remove(vehicle.getHash());
-                checkedVehicles.remove(vehicle.getHash());
             }
         }
         vehicles = newVehicles;
@@ -124,11 +126,7 @@ public class Naloga2 {
      * @return       string associated with given key
      */
     private String getMsg(String which) {
-
-System.out.println("locale " + locale);
-
         ResourceBundle rb = ResourceBundle.getBundle(RESOURCE_BUNDLE, new Locale(locale));
-//        ResourceBundle rb = ResourceBundle.getBundle(RESOURCE_BUNDLE);
         return rb.getString(which);
     }
 
@@ -150,6 +148,8 @@ System.out.println("locale " + locale);
         loadVehiclesFromFile();
         sortVehicles();
         countVehicles();
+
+        vehicleModel = new VehicleDataModel(vehicles);
     }
 
     /**
@@ -203,51 +203,6 @@ System.out.println("locale " + locale);
     }
 
     /**
-     * Store selected vehicles from 'vehicles' array into database.
-     */
-    public void storeVehicles() {
-        ArrayList<VehicleBean> newVehicles = new ArrayList<VehicleBean>();
-
-        QueryResult qr = db.createTable();
-        errorMsg = "";
-        if (qr.error) {
-            errorMsg = getMsg(Errors.TABLE_STORE);
-            logger.error(errorMsg + " " + qr.errorMsg());
-            return;
-        }
-
-        // Get list of selected vehicles.
-        for (VehicleBean vehicle : vehicles) {
-            if (checkedVehicles.containsKey(vehicle.getHash()) &&
-                checkedVehicles.get(vehicle.getHash()) &&
-                !vehiclesInDb.get(vehicle.getHash())) {
-                newVehicles.add(vehicle);
-            }
-        }
-
-        checkedVehicles.clear();
-
-        if (newVehicles.size() <= 0) {
-            errorMsg = getMsg(Errors.NONE_CHOSEN);
-            return;
-        }
-
-        qr = db.storeVehicles(newVehicles);
-        if (qr.error) {
-            errorMsg = getMsg(Errors.VEHICLE_STORE);
-            logger.error(errorMsg + " " + qr.errorMsg());
-            return;
-        }
-
-        vehicles.clear();
-        vehiclesInDb.clear();
-        loadVehiclesFromDb();
-        loadVehiclesFromFile();
-        sortVehicles();
-        countVehicles();
-    }
-
-    /**
      * Remove vehicles from the database.
      */
     public void removeVehicles() {
@@ -258,13 +213,11 @@ System.out.println("locale " + locale);
             logger.error(errorMsg + " " + qr.errorMsg());
             return;
         }
-        vehicles.clear();
-        vehiclesInDb.clear();
-        checkedVehicles.clear();
-        errorMsg = "";
-        loadVehiclesFromFile();
-        sortVehicles();
-        countVehicles();
+
+        // None of the vehicles are in the DB anymore.
+        for (VehicleBean vehicle : vehicles) {
+            vehiclesInDb.put(vehicle.getHash(), false);
+        }
     }
 
     public void setUploadedFile(UploadedFile uploadedFile) {
@@ -319,10 +272,6 @@ System.out.println("locale " + locale);
         return vehiclesInDb;
     }
 
-    public Map<String, Boolean> getCheckedVehicles() {
-        return checkedVehicles;
-    }
-
     public boolean getIsDataValid() {
         return (0 < numVehicles);
     }
@@ -335,9 +284,58 @@ System.out.println("locale " + locale);
         return vehicles;
     }
 
-    // public ArrayList<VehicleBean> getViewVehicles() {
-    //     return viewVehicles;
-    // }
+    public ArrayList<VehicleBean> getSelectedVehicles() {
+        return selectedVehicles;
+    }
+
+    /**
+     * Store given vehicles.
+     * @param selectedVehicles array of selected vehicles to store
+     */
+    public void setSelectedVehicles(ArrayList<VehicleBean> selectedVehicles) {
+        ArrayList<VehicleBean> newVehicles = new ArrayList<VehicleBean>();
+
+        if (selectedVehicles.size() <= 0) {
+            errorMsg = getMsg(Errors.NONE_CHOSEN);
+            return;
+        }
+
+        QueryResult qr = db.createTable();
+        errorMsg = "";
+        if (qr.error) {
+            errorMsg = getMsg(Errors.TABLE_STORE);
+            logger.error(errorMsg + " " + qr.errorMsg());
+            return;
+        }
+
+        // Store those that are not already stored.
+        for (VehicleBean vehicle : selectedVehicles) {
+            if (!vehiclesInDb.get(vehicle.getHash())) {
+                newVehicles.add(vehicle);
+            }
+        }
+
+        if (newVehicles.size() <= 0) {
+            errorMsg = getMsg(Errors.NONE_CHOSEN);
+            return;
+        }
+
+        qr = db.storeVehicles(newVehicles);
+        if (qr.error) {
+            errorMsg = getMsg(Errors.VEHICLE_STORE);
+            logger.error(errorMsg + " " + qr.errorMsg());
+            return;
+        }
+
+        // Update which vehicles are in the database.
+        for (VehicleBean vehicle : newVehicles) {
+            vehiclesInDb.put(vehicle.getHash(), true);
+        }
+    }
+
+    public VehicleDataModel getVehicleModel() {
+        return vehicleModel;
+    }
 
     public String getErrorMsg() {
         return errorMsg;
